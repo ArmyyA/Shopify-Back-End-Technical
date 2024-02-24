@@ -1,4 +1,4 @@
-# Shopify Back-End Technical Project (2024)
+# Shopedia
 ## Live Demo (Best optimized for desktop/laptop)
 Project Demo is **live** at [shopedia.ca](http://shopedia.ca/)
 Project GraphiQL can be accessed at [/graphiql](http://shopedia.ca/graphiql)
