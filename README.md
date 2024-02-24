@@ -1,55 +1,135 @@
-# Technical Instructions
-1. Fork this repo to your local Github account.
-2. Create a new branch to complete all your work in.
-3. Test your work using the provided tests
-4. Create a Pull Request against your local Main branch when you're done and all tests are passing
+# Shopify Back-End Technical Project (2024)
+## Live Demo (Best optimized for desktop/laptop)
+Project Demo is **live** at [shopedia.ca](http://shopedia.ca/)
+Project GraphiQL can be accessed at [/graphiql](http://shopedia.ca/graphiql)
 
-# Project Overview
-The Rails application you will be working on is an Encyclopedia, which allows users to create, view, edit, and delete articles. The application also provides search functionality to help users find relevant articles. The initial setup of the application has been completed, and your task is to write the code that makes the tests pass.
+Hosted on an **AWS EC2 Instance** (Nginx)
 
-# Project Goals
-The main goal of this internship project is to implement the functionality required to make the existing tests pass. The provided tests cover various aspects of the application, including creating and viewing articles, editing and updating articles, deleting articles, and searching for articles. Your task is to write the code that fulfills the requirements specified in the tests.
+## Features
 
-## Your specific goals for this project are as follows:
+- All CRUD functionalities for Articles with search capability, following core MVC principles
+- Authentication: OAuth2 (secure) using Google Provider with session handling
+- User database and associations with created Articles (including user dashboard view)
+- [GraphQL](http://shopedia.ca/graphiql) integration for database queries and mutations
+- Caching (Action and Fragment) for optimized performance
+- Refined and added test cases. **All tests pass** in `article_test.rb.` Tests can be observed using `rails test` command.
 
-1. Review Existing Tests: Start by reviewing the existing tests provided in the article_test.rb file located in the test/models directory. Understand the requirements and expectations of each test.
+## Changes
 
-2. Implement Functionality: Write the code necessary to make the existing tests pass. This involves implementing the required actions and logic in the models, controllers, and views to fulfill the specified requirements.
+- A comprehensive list of changes to application can be viewed in the commit logs. I have utilized [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0-beta.4/)
+- `feat:` denotes a new feature to the application. `fix:` denotes a commit to address bugs/revisions.
 
-3. Ensure Code Quality: Write clean, well-structured, and maintainable code. Follow best practices and adhere to the Ruby on Rails conventions. Pay attention to code readability, modularity, and performance.
 
-4. Test Your Code: After implementing the functionality, run the tests to ensure that they pass successfully. Fix any failures or errors that occur and retest until all tests pass.
+## Usage
+A few important points to note:
+- Only users who are signed-in can create, edit, or delete their articles.
+- Once signed-in, users will be able to see a `Create` button in the navbar.
+- A user may only mutate their own Articles. This is to maintain content integrity and leverage User Authentication.
 
-5. Code Documentation: Document your code by adding comments and explanatory notes where necessary. This will help other developers understand your implementation and make future maintenance easier.
 
-6. Version Control: Use Git for version control. Commit your changes regularly and push them to a branch in your forked repository.
+## GraphQL Queries and Mutations
 
-7. Create a Pull Request: Once you have completed the project goals, create a pull request to merge your changes into the main repository. Provide a clear description of the changes made and any relevant information for the code review.
+All queries and mutations below can be tested in [/graphiql](http://shopedia.ca/graphiql)
 
-## Getting Started
-To get started with this project, follow these steps:
+### Query to fetch all users
+```
+query GetUsers {
+  users {
+    email
+    name
+    uid
+  }
+}
+```
 
-1. Clone the repository to your local development environment.
+### Query to fetch all articles
+```
+query GetArticles{
+articles {
+    id
+    title
+    content
+    userId
+    date
+  }
+}
+```
 
-2. Install the necessary dependencies by running bundle install in the project directory.
+### Query to search for articles (Based on content or title)
+Note: you can change the query string below to test various searches
+```
+query SearchArticles {
+  searchArticles(query: "Testing") {
+    id
+    title
+    content
+  }
+}
+```
 
-3. Familiarize yourself with the existing codebase, including the models, controllers, and views.
+### Mutation for creating an article
+Note: A user is required to create articles. Use the userId provided below. Date format should be exactly the same
+```
+mutation CreateArticle {
+  createArticle(
+    input:{
+      title: "GraphQL",
+      content: "Some content",
+      author:"Shopify",
+      date: "2024-01-16",
+      userId:"105777079670793482961"
+    }) {
+    article {
+      id
+      title
+      content
+      author
+    }
+    errors
+  }
+}
+```
 
-4. Review the existing tests in the article_test.rb file and understand their purpose and functionality.
+### Mutation for deleting an article
+Note: Only articles that exist in the database can be deleted. Select an appropriate article id from GetArticles query.
+```
+mutation DeleteArticle {
+  deleteArticle(input:{
+    id: ""
+  }) {
+    message
+  }
+}
+```
 
-5. Run the tests locally using the rspec command to ensure they are passing.
+### Mutation for updating an article
+Note: Only articles that exist in the database can be updated. Select an appropriate article id from GetArticles query.
+```
+mutation UpdateArticle {
+  updateArticle(input:{
+    id:"24"
+    title: "GraphQL: Mutations"
+  }) {
+    article {
+      id
+      title
+      author
+      content
+    }
+    errors
+  }
+}
+```
 
-6. Start working on the goals outlined above, making improvements to the existing tests and adding new tests as needed.
+## Future Improvements
 
-7. Commit your changes regularly and push them to a branch in your forked repository.
+- Using auth-tokens to allow for scoped queries and mutations in GraphQL (preferably with [JWT](https://jwt.io/))
+- [Elasticsearch ](https://www.elastic.co/) to enhance search functionality (real-time search, 'fuzzy' search, autocomplete etc.)
+- Additional OAuth2 providers (GitHub, Microsoft etc.) 
 
-8. Once you have completed the project goals, create a pull request to merge your changes into the main repository.
+## Dependencies
+- Project was built using `Ruby 3.3.0` and `Rails 7.1.2`
 
-## Resources
-Here are some resources that may be helpful during your internship project:
 
-- [Ruby on Rails Guides](https://guides.rubyonrails.org/) - Comprehensive guides on Ruby on Rails, covering various aspects of web application development.
-
-- [Ruby Style Guide](https://rubystyle.guide/) - A community-driven Ruby coding style guide to ensure consistent and readable code.
-
-- [Git Documentation](https://git-scm.com/doc) - Official documentation for Git, the version control system used in this project.
+## Additional Resources
+- [Tailwind CSS](https://tailwindcss.com/) and [DaisyUI ](https://daisyui.com/) for Frontend design
